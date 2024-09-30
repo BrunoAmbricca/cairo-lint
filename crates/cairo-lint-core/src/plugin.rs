@@ -11,7 +11,7 @@ use crate::lints::ifs::*;
 use crate::lints::manual::*;
 use crate::lints::{
     bool_comparison, breaks, double_comparison, double_parens, duplicate_underscore_args, erasing_op, loop_for_while,
-    loops, panic, single_match,
+    loops, panic, single_match, ok_expect
 };
 
 pub fn cairo_lint_plugin_suite() -> PluginSuite {
@@ -39,6 +39,7 @@ pub enum CairoLintKind {
     Panic,
     ErasingOperation,
     ManualOkOr,
+    OkExpect
 }
 
 pub fn diagnostic_kind_from_message(message: &str) -> CairoLintKind {
@@ -59,6 +60,7 @@ pub fn diagnostic_kind_from_message(message: &str) -> CairoLintKind {
         loop_for_while::LOOP_FOR_WHILE => CairoLintKind::LoopForWhile,
         erasing_op::ERASING_OPERATION => CairoLintKind::ErasingOperation,
         manual_ok_or::MANUAL_OK_OR => CairoLintKind::ManualOkOr,
+        ok_expect::OK_EXPECT_IN_CODE => CairoLintKind::OkExpect,
         _ => CairoLintKind::Unknown,
     }
 }
@@ -158,7 +160,10 @@ fn check_function(db: &dyn SemanticGroup, func_id: FunctionWithBodyId, diagnosti
             Expr::Loop(expr_loop) => {
                 loops::check_loop_match_pop_front(db, expr_loop, diagnostics, &function_body.arenas)
             }
-            Expr::FunctionCall(expr_func) => panic::check_panic_usage(db, expr_func, diagnostics),
+            Expr::FunctionCall(expr_func) => {
+                ok_expect::check_ok_expect_usage(db, expr_func, diagnostics);
+                panic::check_panic_usage(db, expr_func, diagnostics);
+            },
             _ => (),
         };
     }

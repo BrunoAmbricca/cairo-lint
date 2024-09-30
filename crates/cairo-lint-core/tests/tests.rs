@@ -196,3 +196,5 @@ test_file!(
     "test with comment in None",
     "test with comment in Some"
 );
+
+test_file!(ok_expect, ok_expect, "Test name");

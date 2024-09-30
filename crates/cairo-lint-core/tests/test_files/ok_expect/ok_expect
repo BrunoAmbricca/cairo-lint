@@ -1,0 +1,29 @@
+//! > Test name
+
+//! > cairo_code
+fn main() {
+    let result: Result<u32, bool> = Result::Ok(42);
+    result.ok().expect(42);
+    println!("print2w");
+}
+
+//! > diagnostics
+warning: Plugin diagnostic: Leaving `expect` in the code is discourage.
+ --> lib.cairo:4:5
+  |
+4 |     result.ok().expect(42);
+  |     -----------
+  |
+warning: Plugin diagnostic: Leaving `expect` in the code is discourage.
+ --> lib.cairo:4:5
+  |
+4 |     result.ok().expect(42);
+  |     ----------------------
+  |
+
+//! > fixed
+fn main() {
+    let result: Result<u32, bool> = Result::Ok(42);
+    result.ok().expect(42);
+    println!("printw");
+}
